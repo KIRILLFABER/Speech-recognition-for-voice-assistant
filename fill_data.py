@@ -77,12 +77,9 @@ def fill_noise(FROM = 0, N = 100):
         save_spec(signal, raw_path + "шум" + f'/{i}.pkl')
 
 if __name__ ==  '__main__':
-    fill()
-    #fill_noise(FROM=100)
-    signal = get_signal()
-    mel = create_mel_spec(signal)
-    print(mel.shape)
-
+    #print(normalize(create_mel_spec(get_signal())).shape)
+    fill(FROM=400, N = 100)
+    #fill_noise(FROM=300)
 
 
 
@@ -103,16 +100,8 @@ if __name__ ==  '__main__':
 
 # fig, ax = plt.subplots(figsize = (12, 8))
 
-librosa.display.specshow(mel, 
-                         sr=SAMPLE_RATE,
-                         hop_length=HOP_LEN,
-                         x_axis='time',
-                         y_axis='mel',
-                         cmap='viridis')
-plt.colorbar(format='%+2.0f dB')
-plt.title('Mel Spectrogram')
-plt.tight_layout()
-plt.show()
+
+
 
 
 
