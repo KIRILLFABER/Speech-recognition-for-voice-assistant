@@ -1,0 +1,129 @@
+import librosa
+import matplotlib.pyplot as plt
+import numpy as np
+import sounddevice as sd
+import pickle
+
+
+
+N_FFT = 512
+N_MELS = 64
+HOP_LEN = 256
+SAMPLE_RATE = 16000
+DURATION = 1.5
+
+
+def get_signal():
+
+    print("Запись началась...")
+    signal = sd.rec(int(DURATION * SAMPLE_RATE), 
+                   samplerate=SAMPLE_RATE, 
+                   channels=1,
+                   dtype='float32')
+    sd.wait()
+    print("Запись завершена!")
+
+    return signal.flatten()
+
+
+def create_mel_spec(signal):
+    fft = librosa.stft(y = signal, n_fft=N_FFT, hop_length=HOP_LEN)
+    power_spec = np.abs(fft) ** 2
+    mel_spec = librosa.feature.melspectrogram(S=power_spec, sr =SAMPLE_RATE, n_fft=N_FFT, hop_length=HOP_LEN, n_mels = N_MELS)
+    mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+    return mel_spec_db
+
+
+def normalize(mel_spec_db):
+    return (mel_spec_db - np.min(mel_spec_db)) / (np.max(mel_spec_db) - np.min(mel_spec_db))
+
+
+def save_spec(mel_spec, filename):
+    with open(filename, 'wb') as f:
+        pickle.dump(mel_spec, f)
+
+
+
+def fill(FROM = 0, N = 100, debug = False, classes = ['алгоритмы', 'дата', 'время']):
+    norm_path = './data/norm/'
+    wo_norm_path = './data/wo_normalize/'
+    raw_path = './data/raw/'
+    for cls in classes:
+        print('запись для класса:\t', cls)
+        for i in range(FROM, FROM + N):
+            print('запись\t', i)
+            input('enter for record')
+            signal = get_signal()
+            if not debug or bool(int(input("Пишем? 1- ДА, 0 - НЕТ:\n"))):
+                mel_spec = create_mel_spec(signal)
+                norm_mel_spec = normalize(mel_spec)
+                save_spec(mel_spec, wo_norm_path + cls + f'/{i}.pkl')
+                save_spec(norm_mel_spec, norm_path + cls + f'/{i}.pkl')
+                save_spec(signal, raw_path + cls + f'/{i}.pkl')
+            else:
+                i -= 1
+
+def fill_noise(FROM = 0, N = 100):
+    norm_path = './data/norm/'
+    wo_norm_path = './data/wo_normalize/'
+    raw_path = './data/raw/'
+    print('запись для класса:\t шум')
+    for i in range(FROM, FROM + N):
+        #input('enter for record')
+        signal = get_signal()
+        mel_spec = create_mel_spec(signal)
+        norm_mel_spec = normalize(mel_spec)
+        save_spec(mel_spec, wo_norm_path + 'шум' + f'/{i}.pkl')
+        save_spec(norm_mel_spec, norm_path + "шум" + f'/{i}.pkl')
+        save_spec(signal, raw_path + "шум" + f'/{i}.pkl')
+
+if __name__ ==  '__main__':
+    fill()
+    #fill_noise(FROM=100)
+    signal = get_signal()
+    mel = create_mel_spec(signal)
+    print(mel.shape)
+
+
+
+
+# 1 8 15 22 ... 
+
+# signal = get_signal()
+# fig, ax = plt.subplots()
+# print(signal.shape)
+# ax.plot(signal)
+# plt.show()
+
+
+# fft = librosa.stft(y = signal, n_fft=N_FFT, hop_length=HOP_LEN)
+# power_spec = np.abs(fft) ** 2
+# mel_spec = librosa.feature.melspectrogram(S=power_spec, sr =SAMPLE_RATE, n_fft=N_FFT, hop_length=HOP_LEN, n_mels = N_MELS)
+# mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+# mel_spec_db = (mel_spec_db - np.min(mel_spec_db)) / (np.max(mel_spec_db) - np.min(mel_spec_db))
+
+# fig, ax = plt.subplots(figsize = (12, 8))
+
+librosa.display.specshow(mel, 
+                         sr=SAMPLE_RATE,
+                         hop_length=HOP_LEN,
+                         x_axis='time',
+                         y_axis='mel',
+                         cmap='viridis')
+plt.colorbar(format='%+2.0f dB')
+plt.title('Mel Spectrogram')
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
