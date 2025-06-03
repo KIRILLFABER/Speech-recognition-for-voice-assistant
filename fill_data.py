@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sounddevice as sd
 import pickle
+import os
 
 
 
@@ -76,10 +77,33 @@ def fill_noise(FROM = 0, N = 100):
         save_spec(norm_mel_spec, norm_path + "шум" + f'/{i}.pkl')
         save_spec(signal, raw_path + "шум" + f'/{i}.pkl')
 
+def augmentation_data():
+    norm_path = './data/norm/'
+    wo_norm_path = './data/wo_normalize/'
+    raw_path = './data/raw/'
+    paths = [norm_path, wo_norm_path]
+    classes = ['алгоритмы', 'дата', 'время']
+    f = open(norm_path + 'алгоритмы/1.pkl', 'rb')
+    audio = pickle.load(f)
+    f.close()
+    noise = np.random.normal(0, 0.06, audio.shape)
+
+    for path in paths:
+        for c in classes:
+            for filename in
+
+            f = open(path + c, 'rb')
+            audio = pickle.load(f)
+            f.close()
+
+            audio_noisy = normalize(audio + noise)
+
+
+
 if __name__ ==  '__main__':
     #print(normalize(create_mel_spec(get_signal())).shape)
-    fill(FROM=400, N = 100)
-    #fill_noise(FROM=300)
+    #fill(FROM=400, N = 100)
+    fill_noise(FROM=300)
 
 
 
