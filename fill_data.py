@@ -49,9 +49,8 @@ def fill(FROM = 0, N = 100, debug = False, classes = ['алгоритмы', 'д�
     wo_norm_path = './data/wo_normalize/'
     raw_path = './data/raw/'
     for cls in classes:
-        print('запись для класса:\t', cls)
         for i in range(FROM, FROM + N):
-            print('запись\t', i)
+            print(f'запись {i} для класса: {cls}')
             input('enter for record')
             signal = get_signal()
             if not debug or bool(int(input("Пишем? 1- ДА, 0 - НЕТ:\n"))):
