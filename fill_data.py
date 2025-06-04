@@ -90,21 +90,24 @@ def augmentation_data():
 
     for path in paths:
         for c in classes:
-            for filename in
+            for filename in os.listdir(path + c):
+                filepath = os.path.join(path + c, filename)
 
-            f = open(path + c, 'rb')
-            audio = pickle.load(f)
-            f.close()
-
-            audio_noisy = normalize(audio + noise)
+                f = open(filepath,  'rb')
+                audio = pickle.load(f)
+                f.close()
+                audio_noisy = normalize(audio + noise)
+                f = open(filepath[:-4] + 'A.pkl',  'wb')
+                pickle.dump(audio_noisy, f)
+                f.close()
 
 
 
 if __name__ ==  '__main__':
     #print(normalize(create_mel_spec(get_signal())).shape)
     #fill(FROM=400, N = 100)
-    fill_noise(FROM=300)
-
+    #fill_noise(FROM=300)
+    augmentation_data()
 
 
 # 1 8 15 22 ... 
